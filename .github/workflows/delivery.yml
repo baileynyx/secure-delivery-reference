@@ -23,6 +23,15 @@ jobs:
           python-version: '3.12'
       - run: python -m unittest discover -s tests -v
       - run: python rehearse.py
+      # Observe real loopback HTTP responses from verified local packages. The
+      # harness owns disposable workers and never uses a cloud deployment target.
+      - run: python failure_demo.py --output-dir reports/failure-demo
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: delivery-failure-evidence-${{ github.run_id }}-${{ github.run_attempt }}
+          path: reports/failure-demo/
+          retention-days: 14
+          if-no-files-found: error
       - run: docker build -t delivery-demo .
   codeql:
     runs-on: ubuntu-latest
