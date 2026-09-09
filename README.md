@@ -1,8 +1,20 @@
 # Secure delivery reference
 
-A deliberately small Python service with a delivery workflow you can inspect: HTTP tests, deterministic release ZIPs, source-commit metadata, checksum verification, local promotion records and a rollback rehearsal.
+A deliberately small Python service with a delivery workflow you can inspect: HTTP tests, deterministic release ZIPs, source-commit metadata, checksum verification, local promotion records and an HTTP failure-and-recovery rehearsal.
 
-**Scope:** local demonstration and GitHub CI configuration. The promotion command records release state; it does not deploy or restart a running service. No Azure target is configured.
+**Scope:** local demonstration and GitHub CI configuration. The promotion command records release state; a separate demo harness starts disposable loopback workers to verify recovery. No Azure target is configured.
+
+## Start here: failure and recovery demo
+
+[Follow the five-minute walkthrough](DEMO.md) to see a successful release, tampered-package rejection, an injected HTTP 503 failure and verified recovery to the previous package.
+
+```shell
+# From this repository's root, run the disposable HTTP rehearsal and retain
+# JSON/Markdown observations after its temporary packages and workers are removed.
+python failure_demo.py --output-dir reports/failure-demo
+```
+
+Requires Python 3.11 or later plus local child-process and loopback access. The expected result is `passed`: 1.0.0 and 1.1.0 serve healthy responses, altered 1.2.0 bytes are rejected without a state change, and an intact 1.2.0 with injected unhealthy behavior is replaced by verified 1.1.0. The [walkthrough](DEMO.md) explains expected outputs, evidence and limits.
 
 ## Run locally
 
@@ -46,11 +58,11 @@ The trusted expected digest must come from the approved build record. A hash obt
 
 | Stage | Behavior |
 | --- | --- |
-| Pull request | Read-only checkout, unit/HTTP tests, Docker build, CodeQL analysis |
+| Pull request | Read-only checkout, unit/HTTP tests, failure-and-recovery evidence, Docker build, CodeQL analysis |
 | Release request | Manual workflow on main; tests and CodeQL must succeed before packaging |
 | Package | Fixed ZIP metadata, explicit source commit, SHA-256 sidecar; upload retained 14 days |
 | Promotion | Verify bytes and manifest before atomically updating a local single-operator state file |
-| Recovery | Reverify the previous retained artifact before restoring its release record |
+| Recovery | Reverify the previous retained artifact before restoring its release record; the separate local harness restarts it and checks HTTP health/version |
 
 Workflow actions are pinned to upstream commit SHAs, with Dependabot updates. Token permissions are read-only except the CodeQL job's security-event upload. No cloud credentials or `pull_request_target` trigger are used. CodeQL completion is not a guarantee of zero alerts: **the included workflow does not query alert severity to block a release**. Set repository code-scanning rules for your severity policy before treating it as a production security gate.
 
@@ -58,7 +70,7 @@ Workflow actions are pinned to upstream commit SHAs, with Dependabot updates. To
 
 Retain the prior immutable package and its trusted digest. After a failed rollout, stop promotion, switch the deployment target to the prior verified artifact, and check both `/health` and `/version` plus a representative transaction. Record expected and observed versions, digest, health, operator and timestamps. Database migrations require a separate compatibility and recovery plan.
 
-The included `rehearse.py` exercises release-state recovery only. HTTP behavior is tested separately; it does not claim end-to-end deployment recovery.
+The original `rehearse.py` exercises release-state recovery only. The new `failure_demo.py` additionally executes locally built packages in disposable processes and observes HTTP health/version after recovery. It uses different loopback ports, injects the health failure in a harness, and does not test production traffic switching, database recovery or a cloud deployment adapter. See [DEMO.md](DEMO.md).
 
 ## Production extensions
 
