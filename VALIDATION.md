@@ -4,4 +4,6 @@ September 9, 2026: `python -m unittest discover -s tests -v` passed all **10 tes
 
 `python rehearse.py` completed a local release-state simulation: version 1.0.0 was recorded, 1.1.0 was promoted, and rollback restored the original 1.0.0 digest. Synthetic commit identifiers are explicitly confined to the rehearsal and tests.
 
-Docker build/run, hosted GitHub Actions, CodeQL and the release workflow have not been executed. No security scan result is claimed. A live deployment target and health-gated rollback are not implemented; promotion records state only.
+The [first hosted delivery workflow](https://github.com/baileynyx/secure-delivery-reference/actions/runs/34357996018) passed for source commit `684aaf553a29f193202cf894cf491732455802b8`: tests, the local rehearsal, Docker image build and CodeQL initialization/analysis all completed successfully. Successful analysis does not establish that no security alerts exist.
+
+The manual release job was correctly skipped on this push. Container runtime checks, manual release packaging on GitHub and live deployment have not been executed. A live deployment target and health-gated rollback are not implemented; promotion records state only.
