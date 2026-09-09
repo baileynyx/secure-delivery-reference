@@ -1,0 +1,16 @@
+__pycache__/
+*.py[cod]
+.venv/
+.terraform/
+*.tfstate
+*.tfstate.*
+*.tfplan
+*.tfvars
+*.tfvars.json
+!*.example.tfvars
+.env
+.env.*
+reports/
+dist/
+runtime/
+.DS_Store
