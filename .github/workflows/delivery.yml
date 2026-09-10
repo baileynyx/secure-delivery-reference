@@ -53,6 +53,10 @@ jobs:
     if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
     needs: [test, codeql]
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+      attestations: write
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -65,6 +69,25 @@ jobs:
           RELEASE_VERSION: ${{ inputs.version }}
           SOURCE_COMMIT: ${{ github.sha }}
         run: python delivery.py build --version "$RELEASE_VERSION" --commit "$SOURCE_COMMIT"
+      - name: Attest the exact release ZIP
+        id: attest
+        uses: actions/attest@1e69f48acb82d1966a394da916b4c1698aa569d6 # v4
+        with:
+          subject-path: dist/*.zip
+          create-storage-record: false
+      - name: Verify provenance and exercise rejection cases
+        env:
+          GH_TOKEN: ${{ github.token }}
+          SOURCE_COMMIT: ${{ github.sha }}
+          BUNDLE_PATH: ${{ steps.attest.outputs.bundle-path }}
+        run: |
+          # Preserve the original Sigstore bundle alongside the signed bytes.
+          cp "$BUNDLE_PATH" dist/provenance.jsonl
+          gh version
+          packages=(dist/*.zip)
+          test "${#packages[@]}" -eq 1
+          digest=$(cat "${packages[0]}.sha256")
+          python provenance_demo.py "${packages[0]}" --sha256 "$digest" --commit "$SOURCE_COMMIT" --bundle dist/provenance.jsonl --output dist/provenance-evidence.json
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: service-${{ github.sha }}-${{ github.run_id }}-${{ github.run_attempt }}
