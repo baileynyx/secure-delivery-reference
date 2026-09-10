@@ -1,5 +1,7 @@
 # Validation
 
+[Read the engineering case study](docs/attestation-verification-case-study.md) for the failure, diagnosis and corrective decisions.
+
 ## GitHub CLI compatibility fix
 
 [The first manual release](https://github.com/baileynyx/secure-delivery-reference/actions/runs/34428439084)
@@ -16,8 +18,12 @@ historical fixture reproduces the recorded signed ZIP digest exactly.
 
 The separate `check_provenance.py` CI step uses a real GitHub CLI and the existing
 public attestation to exercise the positive and negative cases before merge.
-Check its hosted result for the exact fix commit; local mocks do not establish
-that result. A new manual release is still needed after merge to complete fresh
+[Hosted run 34428858194](https://github.com/baileynyx/secure-delivery-reference/actions/runs/34428858194)
+passed for fix commit `e4126094ddc74bf496d207e59b60acd8ee72d79c`: all 29 tests,
+real-signature verification with seven rejection cases and two successful controls,
+HTTP recovery, Docker build and CodeQL analysis. It uploaded
+`provenance-integration-evidence-34428858194-1` with 14-day retention. Local mocks
+alone do not establish that signature result. A new manual release is still needed after merge to complete fresh
 signing, verification and release-artifact upload together.
 
 ## Provenance gate increment

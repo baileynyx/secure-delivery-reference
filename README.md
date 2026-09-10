@@ -6,6 +6,8 @@ A deliberately small Python service with a delivery workflow you can inspect: HT
 
 **Build trust:** [Follow the provenance walkthrough](PROVENANCE.md) for the fixed repository/workflow policy, signed release verification and rejection evidence. Unit tests simulate the verifier. CI additionally verifies a historical signed release using the real GitHub CLI; new signatures are generated only by a manual release on `main`.
 
+**Engineering case study:** [When green tests missed a release verification failure](docs/attestation-verification-case-study.md) traces the CLI incompatibility, the preserved trust policy and the real-signature regression check.
+
 ## Start here: failure and recovery demo
 
 [Follow the five-minute walkthrough](DEMO.md) to see a successful release, tampered-package rejection, an injected HTTP 503 failure and verified recovery to the previous package.
