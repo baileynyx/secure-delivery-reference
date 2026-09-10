@@ -1,8 +1,10 @@
 # Secure delivery reference
 
-A deliberately small Python service with a delivery workflow you can inspect: HTTP tests, deterministic release ZIPs, source-commit metadata, checksum verification, local promotion records and an HTTP failure-and-recovery rehearsal.
+A deliberately small Python service with a delivery workflow you can inspect: HTTP tests, deterministic release ZIPs, GitHub build attestations, provenance-gated local promotion and an HTTP failure-and-recovery rehearsal.
 
 **Scope:** local demonstration and GitHub CI configuration. The promotion command records release state; a separate demo harness starts disposable loopback workers to verify recovery. No Azure target is configured.
+
+**Build trust:** [Follow the provenance walkthrough](PROVENANCE.md) for the fixed repository/workflow policy, signed release verification and rejection evidence. Unit tests simulate the verifier; real signatures are generated and checked only by a manual release on `main`.
 
 ## Start here: failure and recovery demo
 
@@ -37,7 +39,7 @@ docker run --rm --read-only --cap-drop ALL --security-opt no-new-privileges -p 1
 
 The image runs as numeric UID 10001. Python's standard HTTP server is suitable for this demonstration, not a production internet service.
 
-## Build and verify a real source release
+## Build and inspect a local source package
 
 From a committed Git checkout, in PowerShell:
 
@@ -47,12 +49,11 @@ if ($LASTEXITCODE -ne 0) { throw 'A Git commit is required.' }
 $result = python delivery.py build --version 1.0.0 --commit $commit | ConvertFrom-Json
 if ($LASTEXITCODE -ne 0) { throw 'Build failed.' }
 python delivery.py verify $result.artifact --sha256 $result.sha256
-python delivery.py promote $result.artifact --sha256 $result.sha256
 ```
 
-Build another version and promote it to establish a previous release, then use `python delivery.py rollback`. Promotion and rollback only update `runtime/state.json`; a real deployment adapter must consume the verified package, switch the running service, check health and application behavior, then record success.
+This checks integrity and package structure only. Local builds do not have a trusted GitHub attestation and cannot pass the release promotion CLI. Use [PROVENANCE.md](PROVENANCE.md) to download and verify a signed workflow release, promote it with an explicitly approved commit, and reverify provenance during rollback.
 
-The trusted expected digest must come from the approved build record. A hash obtained from the same untrusted location as an artifact does not establish authenticity. Source metadata is recorded, not cryptographically attested. Local manual builds can include uncommitted changes; the CI release job uses a clean checkout and records its exact commit.
+The expected digest and approved commit must come from the reviewed build record. A checksum alone does not establish authenticity. Local builds can include uncommitted changes; the CI release job checks out its exact commit, builds the package and signs provenance for those bytes. Promotion and rollback only update `runtime/state.json`; a deployment adapter must separately switch the running service and check health.
 
 ## Workflow and trust boundaries
 
@@ -60,11 +61,11 @@ The trusted expected digest must come from the approved build record. A hash obt
 | --- | --- |
 | Pull request | Read-only checkout, unit/HTTP tests, failure-and-recovery evidence, Docker build, CodeQL analysis |
 | Release request | Manual workflow on main; tests and CodeQL must succeed before packaging |
-| Package | Fixed ZIP metadata, explicit source commit, SHA-256 sidecar; upload retained 14 days |
-| Promotion | Verify bytes and manifest before atomically updating a local single-operator state file |
-| Recovery | Reverify the previous retained artifact before restoring its release record; the separate local harness restarts it and checks HTTP health/version |
+| Package | Fixed ZIP metadata, explicit source commit, SHA-256 sidecar and signed Sigstore bundle; upload retained 14 days |
+| Promotion | Verify bytes, manifest and attestation against the fixed repository/workflow/main policy and approved commit before updating local state |
+| Recovery | Require the previous release's approved commit and valid provenance; the separate unsigned local harness exercises HTTP recovery |
 
-Workflow actions are pinned to upstream commit SHAs, with Dependabot updates. Token permissions are read-only except the CodeQL job's security-event upload. No cloud credentials or `pull_request_target` trigger are used. CodeQL completion is not a guarantee of zero alerts: **the included workflow does not query alert severity to block a release**. Set repository code-scanning rules for your severity policy before treating it as a production security gate.
+Workflow actions are pinned to upstream commit SHAs, with Dependabot updates. Token permissions are read-only except CodeQL's security-event upload and the manual release job's OIDC/attestation writes. PR jobs cannot mint release attestations through this workflow. No cloud credentials or `pull_request_target` trigger are used. CodeQL completion is not a guarantee of zero alerts: **the included workflow does not query alert severity to block a release**. Set repository code-scanning rules for your severity policy before treating it as a production security gate.
 
 ## Recovery exercise for a real environment
 

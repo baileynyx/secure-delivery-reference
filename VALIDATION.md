@@ -1,5 +1,23 @@
 # Validation
 
+## Provenance gate increment
+
+Local Python validation passed **27 tests**: the previous 13 plus 14 provenance
+policy, CLI, rejection atomicity, rollback and evidence-harness tests. These tests
+mock GitHub CLI responses; they validate the integration contract and fail-closed
+behavior, not real signature cryptography. They include unavailable/timed-out
+verification, missing proof, wrong approved commit, changed bytes with a recomputed
+digest, mutation during verification and refusal to accept unsafe evidence.
+
+The manual `main` release job is configured to generate a real GitHub attestation,
+run the live positive/rejection exercise and upload its evidence with the bundle.
+**That signed release has not been executed for this increment.** A passing PR
+run cannot establish successful signing. Follow [PROVENANCE.md](PROVENANCE.md)
+after merge and record the exact successful release-run URL and source commit.
+
+GitHub CLI, Docker and CodeQL are not available in the local validation environment.
+Inspect the hosted PR results for Docker/CodeQL evidence. No deployment occurred.
+
 ## Loopback failure and recovery increment
 
 Local Python validation passed all **13 tests**: the original 10 plus three tests for the public HTTP rehearsal/report command, wrong-version rejection with worker cleanup on exception, and refusal to launch a corrupted retained package.

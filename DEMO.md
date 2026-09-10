@@ -19,13 +19,13 @@ cd secure-delivery-demo
 python -m unittest discover -s tests -v
 ```
 
-Expected: 13 tests pass and the final result is `OK`. Complete setup before presenting. If a restricted environment blocks loopback or child processes, use the hosted evidence rather than claiming a local run succeeded.
+Expected: 27 tests pass and the final result is `OK`. This includes mocked provenance-policy tests; they do not create real attestations. Complete setup before presenting. If a restricted environment blocks loopback or child processes, use the hosted evidence rather than claiming a local run succeeded.
 
 ## 0:00–0:45 — Explain the release contract
 
 Open [delivery.py](delivery.py): `build` creates a deterministic allowlisted ZIP, `verify` checks its bytes against an expected SHA-256 and validates its manifest, `promote` records the candidate and previous release, and `rollback` reverifies the retained previous package before restoring its record.
 
-The existing promotion command records state only. The new [failure_demo.py](failure_demo.py) harness adds temporary worker startup, HTTP observations and failure-triggered recovery for this exercise. It executes packages built from this checkout; it is not a sandbox for untrusted code.
+Those Python state helpers are checksum-only primitives used by this synthetic exercise. The public promotion/rollback CLI now additionally requires real provenance; see [PROVENANCE.md](PROVENANCE.md). The [failure_demo.py](failure_demo.py) harness adds temporary worker startup, HTTP observations and failure-triggered recovery. It executes packages built from this checkout; it is not a sandbox for untrusted code.
 
 ## 0:45–2:00 — Run the experiment
 
@@ -65,7 +65,7 @@ Each worker listens on a separate operating-system-assigned loopback port. Worke
 
 ## Evidence and source
 
-Open the [Delivery validation and release workflow](https://github.com/baileynyx/secure-delivery-reference/actions/workflows/delivery.yml), select a run for the commit being reviewed, and inspect the `test` job. It runs the 13 tests, the original record-only rehearsal, this HTTP rehearsal and the Docker build. The separate `codeql` job performs analysis.
+Open the [Delivery validation and release workflow](https://github.com/baileynyx/secure-delivery-reference/actions/workflows/delivery.yml), select a run for the commit being reviewed, and inspect the `test` job. It runs the 27 tests, the original record-only rehearsal, this HTTP rehearsal and the Docker build. The separate `codeql` job performs analysis.
 
 The `delivery-failure-evidence-…` artifact contains the generated JSON and Markdown observations and is retained for 14 days. Its successful upload is not a permanent archive. CodeQL completion does not mean there are no alerts or that a severity policy was enforced. The manual release job remains restricted to an explicitly dispatched run on `main`.
 
