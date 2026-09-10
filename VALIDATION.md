@@ -2,6 +2,22 @@
 
 [Read the engineering case study](docs/attestation-verification-case-study.md) for the failure, diagnosis and corrective decisions.
 
+## Fresh signed release: version 1.0.1
+
+September 10, 2026: [manual run 34453548353](https://github.com/baileynyx/secure-delivery-reference/actions/runs/34453548353) completed successfully on source commit `556a4057d71be166bdc0339737140277db0610a2`. The test, CodeQL and release jobs all passed. This closes the fresh-signing validation gap described in the earlier history below.
+
+The release job built `service-1.0.1-556a4057d71be166bdc0339737140277db0610a2.zip`, created a new attestation and verified it with GitHub CLI 2.98.0. Its recorded package SHA-256 is:
+
+`23d09e14f70b045f69f9012198897286e02211b3f845e7331e1f6d76ed85c00c`
+
+The provenance exercise recorded **two accepted controls and seven rejected cases**: altered bytes with a recomputed checksum, missing bundle, invalid bundle, and unexpected repository, workflow, ref and commit. The three attempted invalid promotions preserved local state. Origin-mismatch cases change verifier expectations against the valid bundle; they do not create foreign certificates.
+
+The same run passed **29 tests**, the historical real-signature integration check, HTTP recovery rehearsal, Docker build and CodeQL analysis. The release upload included four files: the package, checksum, original Sigstore bundle and provenance evidence. [Artifact 10142546073](https://github.com/baileynyx/secure-delivery-reference/actions/runs/34453548353/artifacts/10142546073) has 14-day retention; it is not a permanent archive.
+
+These observations were checked against GitHub job logs, step conclusions and artifact metadata. A [record of the emitted provenance observations](docs/evidence/release-1.0.1.json) is preserved in the repository with the run and package identity. It is a transcription of workflow evidence, not a signature bundle or an independent local cryptographic verification.
+
+This was a signed-package rehearsal on GitHub-hosted runners. It did not deploy to Azure, switch production traffic or establish a CodeQL severity-based release gate.
+
 ## GitHub CLI compatibility fix
 
 [The first manual release](https://github.com/baileynyx/secure-delivery-reference/actions/runs/34428439084)
@@ -23,8 +39,9 @@ passed for fix commit `e4126094ddc74bf496d207e59b60acd8ee72d79c`: all 29 tests,
 real-signature verification with seven rejection cases and two successful controls,
 HTTP recovery, Docker build and CodeQL analysis. It uploaded
 `provenance-integration-evidence-34428858194-1` with 14-day retention. Local mocks
-alone do not establish that signature result. A new manual release is still needed after merge to complete fresh
-signing, verification and release-artifact upload together.
+alone do not establish that signature result. At this stage, fresh signing,
+verification and release-artifact upload together remained pending; the version
+1.0.1 run recorded above subsequently completed that check.
 
 ## Provenance gate increment
 
@@ -37,9 +54,10 @@ digest, mutation during verification and refusal to accept unsafe evidence.
 
 The manual `main` release job is configured to generate a real GitHub attestation,
 run the live positive/rejection exercise and upload its evidence with the bundle.
-**That signed release has not been executed for this increment.** A passing PR
-run cannot establish successful signing. Follow [PROVENANCE.md](PROVENANCE.md)
-after merge and record the exact successful release-run URL and source commit.
+**At this increment's local validation, the signed release had not yet run.**
+A passing PR run alone cannot establish successful signing. The later version
+1.0.1 result above records the completed manual run. Follow
+[PROVENANCE.md](PROVENANCE.md) to repeat it.
 
 GitHub CLI, Docker and CodeQL are not available in the local validation environment.
 Inspect the hosted PR results for Docker/CodeQL evidence. No deployment occurred.

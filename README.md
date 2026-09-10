@@ -8,6 +8,8 @@ A deliberately small Python service with a delivery workflow you can inspect: HT
 
 **Engineering case study:** [When green tests missed a release verification failure](docs/attestation-verification-case-study.md) traces the CLI incompatibility, the preserved trust policy and the real-signature regression check.
 
+**Verified fresh release:** [Version 1.0.1 completed build, signing, verification and evidence upload](https://github.com/baileynyx/secure-delivery-reference/actions/runs/34453548353), with two accepted controls and seven rejected cases. [Read the validation record](VALIDATION.md#fresh-signed-release-version-101) for the exact commit, package digest and scope.
+
 ## Start here: failure and recovery demo
 
 [Follow the five-minute walkthrough](DEMO.md) to see a successful release, tampered-package rejection, an injected HTTP 503 failure and verified recovery to the previous package.

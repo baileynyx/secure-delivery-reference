@@ -60,7 +60,9 @@ The run uploaded `provenance-integration-evidence-34428858194-1`. Workflow artif
 
 ## Outcome and remaining boundary
 
-The corrected wrapper has passed real signature verification and the rejection exercise in CI. A complete fresh manual release after the fix—new signing, verification and release-artifact upload in one run—was still pending when this case study was prepared. The historical integration result is not a claim that this final release has completed.
+The corrected wrapper passed the historical real-signature regression check, then completed a fresh version **1.0.1** release in [manual run 34453548353](https://github.com/baileynyx/secure-delivery-reference/actions/runs/34453548353) on September 10, 2026. The same run built the package from commit `556a4057d71be166bdc0339737140277db0610a2`, created its attestation, accepted two trusted controls, rejected seven negative cases and uploaded the package, checksum, original bundle and evidence.
+
+All 29 tests, HTTP recovery, Docker build and CodeQL analysis passed in that run. The [validation record](../VALIDATION.md#fresh-signed-release-version-101) identifies the package digest, artifact and retained observations. This closes the fresh-release gap that was pending when the case study was first written.
 
 This reference also does not prove cloud deployment, production traffic switching, concurrent state safety or absence of security vulnerabilities. CodeQL completed; no severity-based release blocking policy is claimed.
 
