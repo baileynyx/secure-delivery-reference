@@ -1,0 +1,61 @@
+{
+  "schema_version": 1,
+  "evidence_source": "Provenance JSON transcribed from the successful GitHub release job log; not an independently verified signature bundle.",
+  "workflow_run_url": "https://github.com/baileynyx/secure-delivery-reference/actions/runs/34453548353",
+  "job_id": 102794794347,
+  "release_version": "1.0.1",
+  "artifact_id": 10142546073,
+  "artifact_retention_days": 14,
+  "provenance": {
+    "observations": [
+      {
+        "case": "trusted_release",
+        "result": "accepted"
+      },
+      {
+        "case": "altered_artifact_and_checksum",
+        "result": "rejected",
+        "state_unchanged": true
+      },
+      {
+        "case": "missing_bundle",
+        "result": "rejected",
+        "state_unchanged": true
+      },
+      {
+        "case": "invalid_bundle",
+        "result": "rejected",
+        "state_unchanged": true
+      },
+      {
+        "case": "unexpected_repository",
+        "result": "rejected",
+        "verifier_exit": 1
+      },
+      {
+        "case": "unexpected_workflow",
+        "result": "rejected",
+        "verifier_exit": 1
+      },
+      {
+        "case": "unexpected_ref",
+        "result": "rejected",
+        "verifier_exit": 1
+      },
+      {
+        "case": "unexpected_commit",
+        "result": "rejected",
+        "verifier_exit": 1
+      },
+      {
+        "case": "trusted_release_final_control",
+        "result": "accepted"
+      }
+    ],
+    "observed_at": "2026-09-10T08:09:44.399315+00:00",
+    "result": "passed",
+    "sha256": "23d09e14f70b045f69f9012198897286e02211b3f845e7331e1f6d76ed85c00c",
+    "source_commit": "556a4057d71be166bdc0339737140277db0610a2",
+    "verification": "real GitHub CLI; no mocks"
+  }
+}
