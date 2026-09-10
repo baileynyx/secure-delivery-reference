@@ -19,7 +19,7 @@ cd secure-delivery-demo
 python -m unittest discover -s tests -v
 ```
 
-Expected: 27 tests pass and the final result is `OK`. This includes mocked provenance-policy tests; they do not create real attestations. Complete setup before presenting. If a restricted environment blocks loopback or child processes, use the hosted evidence rather than claiming a local run succeeded.
+Expected: 29 tests pass and the final result is `OK`. This includes mocked provenance-policy tests; they do not create real attestations. Complete setup before presenting. If a restricted environment blocks loopback or child processes, use the hosted evidence rather than claiming a local run succeeded.
 
 ## 0:00–0:45 — Explain the release contract
 
@@ -65,7 +65,7 @@ Each worker listens on a separate operating-system-assigned loopback port. Worke
 
 ## Evidence and source
 
-Open the [Delivery validation and release workflow](https://github.com/baileynyx/secure-delivery-reference/actions/workflows/delivery.yml), select a run for the commit being reviewed, and inspect the `test` job. It runs the 27 tests, the original record-only rehearsal, this HTTP rehearsal and the Docker build. The separate `codeql` job performs analysis.
+Open the [Delivery validation and release workflow](https://github.com/baileynyx/secure-delivery-reference/actions/workflows/delivery.yml), select a run for the commit being reviewed, and inspect the `test` job. It runs the 29 tests, the original record-only rehearsal, this HTTP rehearsal and the Docker build. The separate `codeql` job performs analysis.
 
 The `delivery-failure-evidence-…` artifact contains the generated JSON and Markdown observations and is retained for 14 days. Its successful upload is not a permanent archive. CodeQL completion does not mean there are no alerts or that a severity policy was enforced. The manual release job remains restricted to an explicitly dispatched run on `main`.
 

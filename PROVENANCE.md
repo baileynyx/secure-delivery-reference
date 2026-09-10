@@ -4,9 +4,10 @@ This reference adds a cryptographic build-origin gate to the existing integrity
 and recovery exercises. A checksum says the bytes match an expected digest. A
 GitHub attestation additionally binds those bytes to a workflow identity.
 
-**Evidence status:** ordinary tests use a mocked verifier. A real signature check
-requires the merged workflow to run manually on `main`; a green PR alone does not
-establish that signing or live verification succeeded. No cloud deployment occurs.
+**Evidence status:** ordinary tests use a mocked verifier. CI additionally runs
+`python check_provenance.py` against a historical signed release with the real CLI
+and uploads `provenance-integration-evidence-…`. This verifies existing signatures;
+new signing still requires a manual run on `main`. No cloud deployment occurs.
 
 ## Fixed acceptance policy
 
@@ -30,6 +31,11 @@ The approved commit is not inferred from the downloaded manifest. Repository and
 workflow identities are not caller-selectable CLI flags. Missing proofs, verifier
 errors, timeouts and unsupported CLI flags all prevent promotion. There is no
 checksum-only fallback in the public `promote` or `rollback` command.
+
+The exact `--cert-identity` value enforces the workflow path and ref together.
+Do not also supply `--signer-workflow`: GitHub CLI treats those selectors as
+mutually exclusive. Failed verification now includes bounded, token-redacted CLI
+diagnostics so invocation errors can be distinguished from policy rejections.
 
 ## Create the first signed release
 
@@ -121,8 +127,9 @@ if ($LASTEXITCODE -ne 0) { throw 'Provenance exercise failed.' }
 
 The original [HTTP recovery demo](DEMO.md) uses synthetic commits and checksum-only
 Python state primitives, explicitly separate from the release CLI. Its fixtures
-are not signed release evidence. The unit tests also mock `gh`; only the manual
-release exercises real signatures.
+are not signed release evidence. Unit tests also mock `gh`. The separate CI
+integration check verifies the frozen historical fixture's real signature and
+rejection cases; it does not attest PR code or request signing permissions.
 
 This design trusts GitHub/Sigstore roots, the approved workflow and commit, and
 the local operator. It does not defend against an operator changing the gate or

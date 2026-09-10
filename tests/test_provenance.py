@@ -30,7 +30,6 @@ class ProvenanceTests(unittest.TestCase):
         command = provenance.verification_command(self.artifact, self.commit, self.bundle)
         required = {
             '--hostname': 'github.com', '--repo': 'baileynyx/secure-delivery-reference',
-            '--signer-workflow': 'baileynyx/secure-delivery-reference/.github/workflows/delivery.yml',
             '--cert-identity': 'https://github.com/baileynyx/secure-delivery-reference/.github/workflows/delivery.yml@refs/heads/main',
             '--cert-oidc-issuer': 'https://token.actions.githubusercontent.com',
             '--source-ref': 'refs/heads/main', '--source-digest': self.commit,
@@ -40,6 +39,9 @@ class ProvenanceTests(unittest.TestCase):
         for flag, value in required.items():
             self.assertEqual(command[command.index(flag) + 1], value, flag)
         self.assertIn('--deny-self-hosted-runners', command)
+        # Exact certificate identity replaces every mutually exclusive selector.
+        for selector in ('--signer-workflow', '--signer-repo', '--cert-identity-regex'):
+            self.assertNotIn(selector, command)
         self.assertNotIn('--bundle', provenance.verification_command(self.artifact, self.commit))
 
     def test_successful_verifier_allows_public_cli_promotion(self):
@@ -60,6 +62,22 @@ class ProvenanceTests(unittest.TestCase):
                 with self.assertRaises(provenance.ProvenanceError):
                     delivery.promote_release(self.artifact, self.digest, self.state, self.commit)
             self.assertEqual(self.state.read_bytes(), before)
+
+    def test_verifier_diagnostic_is_retained_and_configured_token_is_redacted(self):
+        failure = subprocess.CompletedProcess([], 1, '', 'conflicting flags\nGH_TOKEN=example-test-token\n::error::detail')
+        with patch.dict('os.environ', {'GH_TOKEN': 'example-test-token'}):
+            with patch('provenance.subprocess.run', return_value=failure):
+                with self.assertRaises(provenance.ProvenanceError) as error:
+                    delivery.promote_release(self.artifact, self.digest, self.state, self.commit)
+        self.assertIn('conflicting flags', str(error.exception))
+        self.assertIn('[REDACTED]', str(error.exception))
+        self.assertNotIn('example-test-token', str(error.exception))
+        self.assertNotIn('\n', str(error.exception))
+        self.assertFalse(self.state.exists())
+
+    def test_verifier_diagnostic_is_bounded(self):
+        result = subprocess.CompletedProcess([], 1, '', 'x' * 5000)
+        self.assertLessEqual(len(provenance.diagnostic(result)), 2000)
 
     def test_verifier_outages_never_create_state(self):
         for failure in (FileNotFoundError(), subprocess.TimeoutExpired('gh', 90)):
