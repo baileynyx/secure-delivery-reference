@@ -22,6 +22,18 @@ jobs:
         with:
           python-version: '3.12'
       - run: python -m unittest discover -s tests -v
+      # Verify an existing signed main artifact with the real CLI. This job
+      # receives no signing permissions and does not attest the PR checkout.
+      - name: Verify real signed fixture and rejection cases
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python check_provenance.py
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: provenance-integration-evidence-${{ github.run_id }}-${{ github.run_attempt }}
+          path: reports/provenance-integration/
+          retention-days: 14
+          if-no-files-found: error
       - run: python rehearse.py
       # Observe real loopback HTTP responses from verified local packages. The
       # harness owns disposable workers and never uses a cloud deployment target.

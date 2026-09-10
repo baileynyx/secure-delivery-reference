@@ -4,7 +4,7 @@ A deliberately small Python service with a delivery workflow you can inspect: HT
 
 **Scope:** local demonstration and GitHub CI configuration. The promotion command records release state; a separate demo harness starts disposable loopback workers to verify recovery. No Azure target is configured.
 
-**Build trust:** [Follow the provenance walkthrough](PROVENANCE.md) for the fixed repository/workflow policy, signed release verification and rejection evidence. Unit tests simulate the verifier; real signatures are generated and checked only by a manual release on `main`.
+**Build trust:** [Follow the provenance walkthrough](PROVENANCE.md) for the fixed repository/workflow policy, signed release verification and rejection evidence. Unit tests simulate the verifier. CI additionally verifies a historical signed release using the real GitHub CLI; new signatures are generated only by a manual release on `main`.
 
 ## Start here: failure and recovery demo
 

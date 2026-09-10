@@ -5,6 +5,7 @@ the Sigstore bundle, artifact digest and certificate identity. Keep policy in
 reviewed source; never take repository/workflow identities from the package.
 """
 from pathlib import Path
+import os
 import re
 import subprocess
 
@@ -29,7 +30,9 @@ def verification_command(artifact, commit, bundle=None):
     command = [
         'gh', 'attestation', 'verify', str(Path(artifact).resolve()),
         '--hostname', 'github.com', '--repo', REPOSITORY,
-        '--signer-workflow', WORKFLOW, '--cert-identity', IDENTITY,
+        # GitHub CLI makes signer-workflow and cert-identity mutually exclusive.
+        # The exact SAN already binds repository, workflow path AND main ref.
+        '--cert-identity', IDENTITY,
         '--cert-oidc-issuer', 'https://token.actions.githubusercontent.com',
         '--source-ref', REF, '--source-digest', commit,
         '--signer-digest', commit, '--deny-self-hosted-runners',
@@ -43,12 +46,25 @@ def verification_command(artifact, commit, bundle=None):
     return command
 
 
+def diagnostic(result):
+    """Keep bounded CLI diagnostics while redacting configured auth tokens."""
+    message = result.stderr or result.stdout or 'No verifier diagnostic was returned.'
+    for name in ('GH_TOKEN', 'GITHUB_TOKEN', 'GH_ENTERPRISE_TOKEN', 'GITHUB_ENTERPRISE_TOKEN'):
+        secret = os.environ.get(name)
+        if secret:
+            message = message.replace(secret, '[REDACTED]')
+    # Flatten control characters/newlines so subprocess text cannot introduce
+    # new GitHub workflow-command lines or terminal escape sequences in logs.
+    message = ' '.join(''.join(c if c.isprintable() else ' ' for c in message).split())
+    return message[-2000:]
+
+
 def verify(artifact, commit, bundle=None):
     """Fail closed on rejected signatures, unavailable CLI, or network errors."""
     command = verification_command(artifact, commit, bundle)
     try:
-        # No shell, interactive prompts or indefinite wait. Do not copy arbitrary
-        # subprocess diagnostics into release-state records or public reports.
+        # No shell, interactive prompts or indefinite wait. Failed verification
+        # reports bounded diagnostics without adding them to release-state records.
         result = subprocess.run(command, stdin=subprocess.DEVNULL,
                                 capture_output=True, text=True, timeout=90,
                                 check=False)
@@ -56,4 +72,4 @@ def verify(artifact, commit, bundle=None):
         raise ProvenanceError('GitHub attestation verifier unavailable or timed out.') from error
     if result.returncode != 0:
         raise ProvenanceError(
-            'GitHub attestation verification failed; check provenance, CLI support and connectivity.')
+            f'GitHub attestation verification failed (exit {result.returncode}): {diagnostic(result)}')

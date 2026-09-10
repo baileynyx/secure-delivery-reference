@@ -1,5 +1,25 @@
 # Validation
 
+## GitHub CLI compatibility fix
+
+[The first manual release](https://github.com/baileynyx/secure-delivery-reference/actions/runs/34428439084)
+successfully created and uploaded an attestation, then failed verification. The
+wrapper supplied both `--signer-workflow` and `--cert-identity`, which
+[GitHub CLI v2.98.0 declares mutually exclusive](https://github.com/cli/cli/blob/v2.98.0/pkg/cmd/attestation/verify/verify.go).
+The fix retains the exact certificate identity, including workflow and main ref,
+and removes the redundant selector. Failures retain bounded CLI diagnostics with
+configured authentication tokens redacted.
+
+All **29 local tests** passed. Regression checks reject conflicting identity
+selectors and verify diagnostic retention, redaction and size limits. The frozen
+historical fixture reproduces the recorded signed ZIP digest exactly.
+
+The separate `check_provenance.py` CI step uses a real GitHub CLI and the existing
+public attestation to exercise the positive and negative cases before merge.
+Check its hosted result for the exact fix commit; local mocks do not establish
+that result. A new manual release is still needed after merge to complete fresh
+signing, verification and release-artifact upload together.
+
 ## Provenance gate increment
 
 Local Python validation passed **27 tests**: the previous 13 plus 14 provenance
