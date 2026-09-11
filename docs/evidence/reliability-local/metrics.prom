@@ -1,0 +1,18 @@
+# HELP lab_http_requests_total Measured synthetic health requests.
+# TYPE lab_http_requests_total counter
+lab_http_requests_total{phase="baseline",outcome="success"} 12
+lab_http_requests_total{phase="baseline",outcome="failure"} 0
+lab_http_requests_total{phase="incident",outcome="success"} 0
+lab_http_requests_total{phase="incident",outcome="failure"} 4
+lab_http_requests_total{phase="recovery",outcome="success"} 12
+lab_http_requests_total{phase="recovery",outcome="failure"} 0
+# HELP lab_http_duration_seconds_total Cumulative measured request duration.
+# TYPE lab_http_duration_seconds_total counter
+lab_http_duration_seconds_total{phase="baseline"} 0.011674260
+lab_http_duration_seconds_total{phase="incident"} 0.004818266
+lab_http_duration_seconds_total{phase="recovery"} 0.024909952
+# HELP lab_http_duration_p95_seconds Nearest-rank p95 for this recorded phase.
+# TYPE lab_http_duration_p95_seconds gauge
+lab_http_duration_p95_seconds{phase="baseline"} 0.001272630
+lab_http_duration_p95_seconds{phase="incident"} 0.001859324
+lab_http_duration_p95_seconds{phase="recovery"} 0.006727960

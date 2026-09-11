@@ -22,6 +22,22 @@ python failure_demo.py --output-dir reports/failure-demo
 
 Requires Python 3.11 or later plus local child-process and loopback access. The expected result is `passed`: 1.0.0 and 1.1.0 serve healthy responses, altered 1.2.0 bytes are rejected without a state change, and an intact 1.2.0 with injected unhealthy behavior is replaced by verified 1.1.0. The [walkthrough](DEMO.md) explains expected outputs, evidence and limits.
 
+## Measure detection and recovery
+
+The [service reliability lab](docs/reliability-lab.md) adds synthetic traffic,
+request latency, sustained-error alerting and a documented recovery runbook to the
+existing disposable HTTP service. Run it from the repository root with Python 3.12+:
+
+```shell
+# A new report directory is chosen automatically, preserving earlier evidence.
+python reliability_lab.py
+```
+
+It records the baseline, injected HTTP 503s, alert, rollback and verified recovery.
+Results include raw samples, an incident report and a Prometheus-text snapshot.
+The short sample windows and local timings describe a rehearsal, not production
+SLO compliance. [Inspect the retained local capture](docs/evidence/reliability-local/README.md).
+
 ## Run locally
 
 Requires Python 3.11 or later and no Python packages.

@@ -1,0 +1,5 @@
+# Preserve capture hashes across Windows and Linux checkouts.
+docs/evidence/reliability-local/*.json -text
+docs/evidence/reliability-local/*.jsonl -text
+docs/evidence/reliability-local/*.md -text
+docs/evidence/reliability-local/*.prom -text
