@@ -1,0 +1,129 @@
+{
+  "artifact_sha256": {
+    "incident.md": "d0e722dfd999c4c91a6e86416bf4a4b997a4a937c1238e7eb513f2e2fbe887c4",
+    "metrics.prom": "3687515883807c27b35cd2773189629675398cae02466838cc9bcc8ad20b8fe3",
+    "samples.jsonl": "f64f2545b685c9a209de79a37b54fa27023bccf87410b48a862b293a2129223f"
+  },
+  "candidate_release": {
+    "sha256": "3da59ff593a43166ddc99e55545e314b4232666c9b27ad88e6a9c56c894ab34f",
+    "version": "1.1.0"
+  },
+  "cleanup": "all owned workers stopped; temporary packages and state removed",
+  "completed_at": "2026-09-11T11:37:12.519411+00:00",
+  "environment": {
+    "machine": "x86_64",
+    "python": "3.12.14",
+    "system": "Linux"
+  },
+  "interval_seconds": 0.1,
+  "measurements": {
+    "alert_to_verified_recovery_seconds": 1.244646,
+    "observed_fault_to_alert_seconds": 0.308622,
+    "total_seconds": 2.792707
+  },
+  "phases": {
+    "baseline": {
+      "error_ratio": 0.0,
+      "errors": 0,
+      "p95_ms": 1.27263,
+      "requests": 12
+    },
+    "incident": {
+      "error_ratio": 1.0,
+      "errors": 4,
+      "p95_ms": 1.859324,
+      "requests": 4
+    },
+    "recovery": {
+      "error_ratio": 0.0,
+      "errors": 0,
+      "p95_ms": 6.72796,
+      "requests": 12
+    }
+  },
+  "policy": {
+    "clear_windows": 2,
+    "error_ratio": 0.6,
+    "fire_windows": 2,
+    "p95_ms": 500.0,
+    "window": 5
+  },
+  "provenance": "unsigned local capture; checksum-only package helpers; synthetic package commit IDs",
+  "request_counts_exclude": "readiness and version checks; worker-transition gaps are unmeasured",
+  "restored_release": {
+    "sha256": "9fbfa75972ed6392b1007f037278445a368eb6fecdcf4d11c0944e49c55439a5",
+    "version": "1.0.0"
+  },
+  "result": "passed",
+  "schema": "local-reliability-v1",
+  "scope": "synthetic traffic to sequential disposable loopback workers",
+  "source_sha256": {
+    "app.py": "e24495a9fe634f43d547acd1bb32176cbdad4c8ce136c1b475711139477d627d",
+    "delivery.py": "2089d86100fabd2495da72d8d773e4f6fe008878d6c65d5a5b75fb35f0133491",
+    "demo_service.py": "0a4ae8a46635e9d4dacea03e1f05e3653a039df0fb5f728911def7ef13827d12",
+    "failure_demo.py": "8890957da685d16add7bfd822f20e83d82c362bfcca49b979f2e8d3303957e70",
+    "provenance.py": "19e645ff4b6d141340b472ccaf76331be82f69cb3c3ed0263d797ec0f3badce8",
+    "reliability_lab.py": "65f5acb8428b53e807fac330fd0985099375be2dfd1c963e1a29fb9a991bc16f"
+  },
+  "started_at": "2026-09-11T11:37:09.726658+00:00",
+  "timeline": [
+    {
+      "elapsed_seconds": 0.059954,
+      "event": "baseline_started",
+      "version": "1.0.0"
+    },
+    {
+      "elapsed_seconds": 1.1842,
+      "event": "baseline_verified",
+      "measured_requests": 12
+    },
+    {
+      "elapsed_seconds": 1.23797,
+      "event": "fault_observed",
+      "injected_behavior": "HTTP 503",
+      "version": "1.1.0"
+    },
+    {
+      "elapsed_seconds": 1.546592,
+      "event": "alert_fired",
+      "sample_sequence": 16,
+      "window": {
+        "error_ratio": 0.8,
+        "errors": 4,
+        "p95_ms": 1.859324,
+        "requests": 5
+      }
+    },
+    {
+      "action": "Stop candidate; reverify and restore previous package",
+      "elapsed_seconds": 1.546596,
+      "event": "recovery_started"
+    },
+    {
+      "elapsed_seconds": 1.65282,
+      "event": "restored_service_ready",
+      "version": "1.0.0"
+    },
+    {
+      "elapsed_seconds": 2.175281,
+      "event": "alert_cleared",
+      "sample_sequence": 22,
+      "window": {
+        "error_ratio": 0.0,
+        "errors": 0,
+        "p95_ms": 6.72796,
+        "requests": 5
+      }
+    },
+    {
+      "elapsed_seconds": 2.791238,
+      "event": "recovery_verified",
+      "measured_requests": 12,
+      "version": "1.0.0"
+    },
+    {
+      "elapsed_seconds": 2.792707,
+      "event": "cleanup_complete"
+    }
+  ]
+}
