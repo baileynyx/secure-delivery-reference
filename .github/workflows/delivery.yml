@@ -28,7 +28,7 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: python check_provenance.py
-      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: provenance-integration-evidence-${{ github.run_id }}-${{ github.run_attempt }}
           path: reports/provenance-integration/
@@ -38,7 +38,7 @@ jobs:
       # Observe real loopback HTTP responses from verified local packages. The
       # harness owns disposable workers and never uses a cloud deployment target.
       - run: python failure_demo.py --output-dir reports/failure-demo
-      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: delivery-failure-evidence-${{ github.run_id }}-${{ github.run_attempt }}
           path: reports/failure-demo/
@@ -100,7 +100,7 @@ jobs:
           test "${#packages[@]}" -eq 1
           digest=$(cat "${packages[0]}.sha256")
           python provenance_demo.py "${packages[0]}" --sha256 "$digest" --commit "$SOURCE_COMMIT" --bundle dist/provenance.jsonl --output dist/provenance-evidence.json
-      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: service-${{ github.sha }}-${{ github.run_id }}-${{ github.run_attempt }}
           path: dist/
